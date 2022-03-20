@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"praktek-grpc-go/greet/greetpb"
+	greeting_pb "praktek-grpc-go/greeting/greeting_pb"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -19,16 +19,16 @@ func main() {
 		log.Fatalf("couldn't connect : %v", err)
 	}
 	defer cc.Close()
-	c := greetpb.NewGreetServiceClient(cc)
+	c := greeting_pb.NewGreetServiceClient(cc)
 
 	// fmt.Printf("created client %f", c)
 	doUnary(c)
 }
 
-func doUnary(c greetpb.GreetServiceClient) {
+func doUnary(c greeting_pb.GreetServiceClient) {
 	fmt.Println("starting to do a unary rpc")
-	req := &greetpb.GreetRequest{
-		Greeting: &greetpb.Greeting{
+	req := &greeting_pb.GreetingRequest{
+		Greeting: &greeting_pb.Greeting{
 			FirstName: "Feri",
 			LastName:  "Fahrul",
 		},

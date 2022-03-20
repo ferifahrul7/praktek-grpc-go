@@ -5,22 +5,23 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"praktek-grpc-go/greet/greetpb"
+	"praktek-grpc-go/greeting/greeting_pb"
 
 	"google.golang.org/grpc"
 )
 
 type server struct {
+	greeting_pb.UnimplementedGreetServiceServer
 }
 
-func (*server) Greet(ctx context.Context, req *greetpb.GreetRequest) (*greetpb.GreetResponse, error) {
+func (*server) Greet(ctx context.Context, req *greeting_pb.GreetingRequest) (*greeting_pb.GreetingResponse, error) {
 
 	fmt.Printf("Greet function was invoked with %v \n", req)
 
 	firstName := req.GetGreeting().GetFirstName()
 	lastName := req.GetGreeting().GetLastName()
 	result := "Hello " + firstName + " " + lastName
-	res := &greetpb.GreetResponse{
+	res := &greeting_pb.GreetingResponse{
 		Result: result,
 	}
 	return res, nil
@@ -35,7 +36,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	greetpb.RegisterGreetServiceServer(s, &server{})
+	greeting_pb.RegisterGreetServiceServer(s, &server{})
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
