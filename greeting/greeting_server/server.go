@@ -17,9 +17,35 @@ type server struct {
 	greeting_pb.UnimplementedGreetServiceServer
 }
 
+func (*server) GreetEveryone(stream greeting_pb.GreetService_GreetEveryoneServer) error {
+
+	fmt.Printf("longreet function was invoked with bidi req")
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			log.Fatalf("error when reading client stream : %v", err)
+			return err
+		}
+		firstName := req.GetGreeting().GetFirstName()
+		lastName := req.GetGreeting().GetLastName()
+		result := "Hai ada apa mas " + firstName + lastName + "? "
+		err = stream.Send(&greeting_pb.GreetingEveryoneResponse{
+			Result: result,
+		})
+		if err != nil {
+			log.Fatalf("error when sending: %v", err)
+			return err
+		}
+
+	}
+}
+
 func (*server) LongGreet(stream greeting_pb.GreetService_LongGreetServer) error {
 	fmt.Printf("longreet function was invoked with streaming req")
-	result := "xx"
+	result := ""
 	for {
 		req, err := stream.Recv()
 		if err == io.EOF {
@@ -30,10 +56,11 @@ func (*server) LongGreet(stream greeting_pb.GreetService_LongGreetServer) error 
 		}
 		if err != nil {
 			log.Fatalf("error while reading : %v", err)
+			return err
 		}
 		firstName := req.GetGreeting().GetFirstName()
 		lastName := req.GetGreeting().GetLastName()
-		result += "Hello" + firstName + lastName + " !!"
+		result += "  Hello" + firstName + lastName + " !! "
 	}
 }
 
