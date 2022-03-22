@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"praktek-grpc-go/greeting/greeting_pb"
@@ -16,8 +17,28 @@ type server struct {
 	greeting_pb.UnimplementedGreetServiceServer
 }
 
+func (*server) LongGreet(stream greeting_pb.GreetService_LongGreetServer) error {
+	fmt.Printf("longreet function was invoked with streaming req")
+	result := "xx"
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			// finished reading stream
+			return stream.SendAndClose(&greeting_pb.LongGreetingResponse{
+				Result: result,
+			})
+		}
+		if err != nil {
+			log.Fatalf("error while reading : %v", err)
+		}
+		firstName := req.GetGreeting().GetFirstName()
+		lastName := req.GetGreeting().GetLastName()
+		result += "Hello" + firstName + lastName + " !!"
+	}
+}
+
 func (*server) GreetManyTimes(req *greeting_pb.GreetingManyTimesRequest, stream greeting_pb.GreetService_GreetManyTimesServer) error {
-	fmt.Printf("GreetingManyTimes function was invoked with %v \n", req)
+	fmt.Printf("GreetingManyTimes function was invoked with %v \n", stream)
 	firstName := req.GetGreeting().GetFirstName()
 	lastName := req.GetGreeting().GetLastName()
 	for i := 0; i < 99; i++ {

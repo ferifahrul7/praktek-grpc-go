@@ -19,9 +19,18 @@ message GreetingManyTimesRequest{
 message GreetingManyTimesResponse{
 	string result = 1;
 }
+
+message LongGreetingRequest{
+	Greeting greeting =1;
+}
+message LongGreetingResponse{
+	string result =1;
+}
 service GreetService{
 	//unary
 	rpc Greet(GreetingRequest) returns (GreetingResponse) {};
 	//server streaming
 	rpc GreetManyTimes(GreetingManyTimesRequest) returns (stream GreetingManyTimesResponse){};
+	//client streaming
+	rpc LongGreet(stream LongGreetingRequest) returns (LongGreetingResponse){};
 }
