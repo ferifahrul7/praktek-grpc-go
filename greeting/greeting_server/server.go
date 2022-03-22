@@ -6,6 +6,8 @@ import (
 	"log"
 	"net"
 	"praktek-grpc-go/greeting/greeting_pb"
+	"strconv"
+	"time"
 
 	"google.golang.org/grpc"
 )
@@ -14,6 +16,21 @@ type server struct {
 	greeting_pb.UnimplementedGreetServiceServer
 }
 
+func (*server) GreetManyTimes(req *greeting_pb.GreetingManyTimesRequest, stream greeting_pb.GreetService_GreetManyTimesServer) error {
+	fmt.Printf("GreetingManyTimes function was invoked with %v \n", req)
+	firstName := req.GetGreeting().GetFirstName()
+	lastName := req.GetGreeting().GetLastName()
+	for i := 0; i < 99; i++ {
+		result := "Hello " + firstName + " " + lastName + " " + strconv.Itoa(i)
+		res := &greeting_pb.GreetingManyTimesResponse{
+			Result: result,
+		}
+		stream.Send(res)
+		time.Sleep(1000 * time.Millisecond)
+	}
+	return nil
+
+}
 func (*server) Greet(ctx context.Context, req *greeting_pb.GreetingRequest) (*greeting_pb.GreetingResponse, error) {
 
 	fmt.Printf("Greet function was invoked with %v \n", req)
